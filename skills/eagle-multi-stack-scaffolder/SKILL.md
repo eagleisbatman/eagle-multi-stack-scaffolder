@@ -5,11 +5,13 @@ description: >
   when the user asks to: create a new app, scaffold a project, set up a new project, initialize
   a codebase, start a new application, bootstrap a project, or needs help with project structure
   and dependencies. Covers mobile development (SwiftUI for iOS/macOS, Jetpack Compose for Android,
-  Expo React Native for cross-platform), backend APIs (Node.js/Express, Python/FastAPI, Python/Flask,
-  Python/Django, Rust/Axum), and web frontends (Next.js for React, Nuxt.js for Vue). This skill
-  ensures Claude researches current best practices via web search BEFORE generating any code,
-  documents all dependency choices with justifications, and follows modern package manager
-  recommendations (Bun for JS/TS, uv for Python, cargo for Rust, SPM for Swift).
+  Kotlin XML Views for traditional Android, Flutter for cross-platform, Expo React Native for
+  cross-platform), backend APIs (Node.js/Express, Python/FastAPI, Python/Flask, Python/Django,
+  Rust/Axum), and web frontends (Next.js for React, Nuxt.js for Vue). All mobile stacks include
+  comprehensive design system patterns with tokens, components, and Material 3/Cupertino styling.
+  This skill ensures Claude researches current best practices via web search BEFORE generating
+  any code, documents all dependency choices with justifications, and follows modern package
+  manager recommendations (Bun for JS/TS, uv for Python, cargo for Rust, SPM for Swift).
 ---
 
 # Eagle Multi-Stack Scaffolder
@@ -40,7 +42,9 @@ When the user describes what they want to build, map their request to the approp
 | User Says | Stack to Use | Reference File |
 |-----------|--------------|----------------|
 | "iOS app", "iPhone", "iPad", "macOS", "Apple", "Swift" | SwiftUI | `references/swiftui.md` |
-| "Android app", "Kotlin", "Google Play" | Jetpack Compose | `references/jetpack-compose.md` |
+| "Android app", "Kotlin", "Compose" | Jetpack Compose | `references/jetpack-compose.md` |
+| "Android XML", "traditional Android", "XML views" | Kotlin XML Views | `references/kotlin-xml-views.md` |
+| "Flutter", "Dart", "cross-platform" | Flutter | `references/flutter.md` |
 | "mobile app", "cross-platform", "iOS and Android", "React Native" | Expo React Native | `references/expo-react-native.md` |
 | "Node API", "Express", "JavaScript backend", "TypeScript API" | Node.js + Express | `references/node-express.md` |
 | "FastAPI", "async Python", "high-performance Python API" | FastAPI | `references/fastapi.md` |

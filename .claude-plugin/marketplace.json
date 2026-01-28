@@ -5,14 +5,14 @@
     "email": "mandewalkergautam@gmail.com"
   },
   "metadata": {
-    "description": "Research-driven project scaffolding for mobile, backend, and web applications. Supports SwiftUI, Jetpack Compose, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js.",
+    "description": "Research-driven project scaffolding with design systems for mobile, backend, and web applications. Supports SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "eagle-multi-stack-scaffolder",
       "source": "./",
-      "description": "Research-driven scaffolding for SwiftUI, Jetpack Compose, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js. Automatically researches best practices, recommends dependencies, and generates production-ready project structures.",
+      "description": "Research-driven scaffolding with design systems for SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js. Includes Material 3, Cupertino, NativeWind patterns. Automatically researches best practices, recommends dependencies, and generates production-ready project structures.",
       "version": "1.0.0",
       "author": {
         "name": "Eagle (Gautam Mandewalker)",
@@ -23,10 +23,16 @@
         "mobile",
         "backend",
         "frontend",
+        "design-system",
         "expo",
         "react-native",
         "swiftui",
         "jetpack-compose",
+        "kotlin-xml",
+        "flutter",
+        "material3",
+        "cupertino",
+        "nativewind",
         "nextjs",
         "nuxtjs",
         "fastapi",

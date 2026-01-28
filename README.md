@@ -16,7 +16,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Stacks-10-green?style=for-the-badge" alt="10 Stacks">
+  <img src="https://img.shields.io/badge/Stacks-12-green?style=for-the-badge" alt="12 Stacks">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -49,8 +49,12 @@ Eagle Multi-Stack Scaffolder teaches Claude to **research before coding**. It:
 | Stack | Use Case |
 |-------|----------|
 | **SwiftUI** | Native iOS/macOS apps |
-| **Jetpack Compose** | Native Android apps |
-| **Expo React Native** | Cross-platform mobile apps |
+| **Jetpack Compose** | Native Android apps (modern) |
+| **Kotlin XML Views** | Native Android apps (traditional) |
+| **Flutter** | Cross-platform (Dart) |
+| **Expo React Native** | Cross-platform (JavaScript/TypeScript) |
+
+All mobile stacks include **design system patterns** with tokens, components, Material 3/Cupertino styling, and dark mode support.
 
 ### Backend Development
 | Stack | Use Case |
@@ -177,9 +181,11 @@ The plugin includes detailed guides for each stack:
 
 ```
 skills/eagle-multi-stack-scaffolder/references/
-├── swiftui.md           # iOS/macOS patterns
-├── jetpack-compose.md   # Android patterns
-├── expo-react-native.md # Cross-platform mobile
+├── swiftui.md           # iOS/macOS with design system
+├── jetpack-compose.md   # Android Compose with Material 3
+├── kotlin-xml-views.md  # Android XML with Material 3
+├── flutter.md           # Flutter with design tokens
+├── expo-react-native.md # React Native with NativeWind/Paper
 ├── node-express.md      # Node.js APIs
 ├── fastapi.md           # FastAPI (async Python)
 ├── flask.md             # Flask (lightweight Python)
@@ -208,8 +214,8 @@ Contributions are welcome! Here's how:
 4. **Submit** a PR
 
 ### Ideas for contributions:
-- Add Flutter support
 - Add Go backend reference
+- Add SvelteKit reference
 - Improve existing stack patterns
 - Add more community package recommendations
 

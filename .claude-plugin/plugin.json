@@ -1,7 +1,7 @@
 {
   "name": "eagle-multi-stack-scaffolder",
   "version": "1.0.0",
-  "description": "Research-driven scaffolding for SwiftUI, Jetpack Compose, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js",
+  "description": "Research-driven scaffolding with design systems for SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js",
   "author": {
     "name": "Eagle (Gautam Mandewalker)",
     "email": "mandewalkergautam@gmail.com",
@@ -15,10 +15,14 @@
     "mobile",
     "backend",
     "frontend",
+    "design-system",
     "expo",
     "react-native",
     "swiftui",
     "jetpack-compose",
+    "kotlin-xml",
+    "flutter",
+    "material3",
     "nextjs",
     "nuxtjs",
     "fastapi",
