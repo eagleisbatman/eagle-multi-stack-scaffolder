@@ -16,7 +16,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Stacks-8-green?style=for-the-badge" alt="8 Stacks">
+  <img src="https://img.shields.io/badge/Stacks-10-green?style=for-the-badge" alt="10 Stacks">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -56,6 +56,8 @@ Eagle Multi-Stack Scaffolder teaches Claude to **research before coding**. It:
 | Stack | Use Case |
 |-------|----------|
 | **Node.js + Express** | JavaScript/TypeScript APIs |
+| **FastAPI** | High-performance async Python APIs |
+| **Flask** | Lightweight Python APIs & microservices |
 | **Django** | Python APIs with batteries included |
 | **Rust (Axum)** | High-performance, memory-safe APIs |
 
@@ -174,7 +176,9 @@ skills/eagle-multi-stack-scaffolder/references/
 ├── jetpack-compose.md   # Android patterns
 ├── expo-react-native.md # Cross-platform mobile
 ├── node-express.md      # Node.js APIs
-├── django.md            # Python APIs
+├── fastapi.md           # FastAPI (async Python)
+├── flask.md             # Flask (lightweight Python)
+├── django.md            # Django (batteries-included Python)
 ├── rust-backend.md      # Rust APIs
 ├── nextjs.md            # React web
 └── nuxtjs.md            # Vue web

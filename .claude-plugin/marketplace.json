@@ -5,14 +5,14 @@
     "email": "mandewalkergautam@gmail.com"
   },
   "metadata": {
-    "description": "Research-driven project scaffolding for mobile, backend, and web applications. Supports SwiftUI, Jetpack Compose, Expo React Native, Node/Express, Django, Rust, Next.js, and Nuxt.js.",
+    "description": "Research-driven project scaffolding for mobile, backend, and web applications. Supports SwiftUI, Jetpack Compose, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "eagle-multi-stack-scaffolder",
       "source": "./",
-      "description": "Research-driven scaffolding for SwiftUI, Jetpack Compose, Expo React Native, Node/Express, Django, Rust, Next.js, and Nuxt.js. Automatically researches best practices, recommends dependencies, and generates production-ready project structures.",
+      "description": "Research-driven scaffolding for SwiftUI, Jetpack Compose, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, and Nuxt.js. Automatically researches best practices, recommends dependencies, and generates production-ready project structures.",
       "version": "1.0.0",
       "author": {
         "name": "Eagle (Gautam Mandewalker)",
@@ -29,13 +29,17 @@
         "jetpack-compose",
         "nextjs",
         "nuxtjs",
+        "fastapi",
+        "flask",
         "django",
+        "python",
         "rust",
         "node",
         "express",
         "project-setup",
         "best-practices",
         "bun",
+        "uv",
         "typescript"
       ],
       "category": "development",
