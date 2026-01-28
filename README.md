@@ -108,6 +108,11 @@ I need a mobile app with a Node backend and admin dashboard
 Set up a new Django REST API with PostgreSQL
 ```
 
+**Python API with FastAPI:**
+```
+Create a FastAPI backend with JWT authentication and PostgreSQL
+```
+
 **Multi-stack:**
 ```
 Build me:
@@ -125,8 +130,8 @@ Claude identifies which stacks you need based on your request.
 
 ### 2. Research Phase
 For **each** stack, Claude searches the web for:
-- `"[stack] best practices 2025"`
-- `"[stack] recommended libraries"`
+- `"[stack] best practices 2025 2026"`
+- `"[stack] recommended libraries 2025"`
 - `"[stack] project structure"`
 
 ### 3. Documentation Generation
