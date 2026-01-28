@@ -16,7 +16,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Stacks-12-green?style=for-the-badge" alt="12 Stacks">
+  <img src="https://img.shields.io/badge/Stacks-13-green?style=for-the-badge" alt="13 Stacks">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -65,11 +65,24 @@ All mobile stacks include **design system patterns** with tokens, components, Ma
 | **Django** | Python APIs with batteries included |
 | **Rust (Axum)** | High-performance, memory-safe APIs |
 
+All backend stacks include:
+- **Database setup**: PostgreSQL (primary), MongoDB, SQLite
+- **ORM options**: Prisma, Drizzle, SQLAlchemy, SQLModel, SQLx
+- **Object storage**: MinIO (S3-compatible)
+- **Deployment**: Railway with health checks
+
 ### Web Frontend
 | Stack | Use Case |
 |-------|----------|
 | **Next.js** | React SSR/SSG dashboards |
 | **Nuxt.js** | Vue SSR/SSG dashboards |
+
+### Architecture
+| Stack | Use Case |
+|-------|----------|
+| **Monorepo (Turborepo)** | Multi-app projects with shared packages |
+
+Monorepo support includes Turborepo + pnpm workspaces, shared packages, remote caching, and per-app Railway deployment.
 
 ---
 
@@ -121,8 +134,13 @@ Create a FastAPI backend with JWT authentication and PostgreSQL
 ```
 Build me:
 - React Native app (Expo)
-- Express API backend  
+- Express API backend
 - Next.js admin panel
+```
+
+**Monorepo setup:**
+```
+Create a Turborepo monorepo with a Next.js web app, Express API, and shared UI components
 ```
 
 ---
@@ -186,20 +204,23 @@ skills/eagle-multi-stack-scaffolder/references/
 ├── kotlin-xml-views.md  # Android XML with Material 3
 ├── flutter.md           # Flutter with design tokens
 ├── expo-react-native.md # React Native with NativeWind/Paper
-├── node-express.md      # Node.js APIs
-├── fastapi.md           # FastAPI (async Python)
-├── flask.md             # Flask (lightweight Python)
-├── django.md            # Django (batteries-included Python)
-├── rust-backend.md      # Rust APIs
+├── node-express.md      # Node.js APIs with Prisma/Drizzle
+├── fastapi.md           # FastAPI with SQLModel/SQLAlchemy
+├── flask.md             # Flask with Flask-SQLAlchemy
+├── django.md            # Django with Django ORM
+├── rust-backend.md      # Rust APIs with SQLx
 ├── nextjs.md            # React web
-└── nuxtjs.md            # Vue web
+├── nuxtjs.md            # Vue web
+└── monorepo.md          # Turborepo + pnpm workspaces
 ```
 
 Each reference includes:
 - Research queries to run
 - Recommended project structure
+- Database & ORM setup
 - Essential libraries
 - Code patterns
+- Deployment configuration (Railway)
 - Setup commands
 
 ---

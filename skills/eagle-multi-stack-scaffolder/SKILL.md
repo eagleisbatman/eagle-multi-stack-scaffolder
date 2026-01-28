@@ -3,15 +3,18 @@ name: eagle-multi-stack-scaffolder
 description: >
   Research-driven project scaffolding for multiple technology stacks. This skill MUST be used
   when the user asks to: create a new app, scaffold a project, set up a new project, initialize
-  a codebase, start a new application, bootstrap a project, or needs help with project structure
-  and dependencies. Covers mobile development (SwiftUI for iOS/macOS, Jetpack Compose for Android,
-  Kotlin XML Views for traditional Android, Flutter for cross-platform, Expo React Native for
-  cross-platform), backend APIs (Node.js/Express, Python/FastAPI, Python/Flask, Python/Django,
-  Rust/Axum), and web frontends (Next.js for React, Nuxt.js for Vue). All mobile stacks include
-  comprehensive design system patterns with tokens, components, and Material 3/Cupertino styling.
-  This skill ensures Claude researches current best practices via web search BEFORE generating
-  any code, documents all dependency choices with justifications, and follows modern package
-  manager recommendations (Bun for JS/TS, uv for Python, cargo for Rust, SPM for Swift).
+  a codebase, start a new application, bootstrap a project, set up a monorepo, or needs help
+  with project structure, dependencies, database setup, or deployment. Covers mobile development
+  (SwiftUI for iOS/macOS, Jetpack Compose for Android, Kotlin XML Views for traditional Android,
+  Flutter for cross-platform, Expo React Native for cross-platform), backend APIs (Node.js/Express,
+  Python/FastAPI, Python/Flask, Python/Django, Rust/Axum), web frontends (Next.js for React,
+  Nuxt.js for Vue), and monorepo architecture (Turborepo). All mobile stacks include comprehensive
+  design system patterns with tokens, components, and Material 3/Cupertino styling. All backend
+  stacks include database setup (PostgreSQL, MongoDB, SQLite), ORM configuration (Prisma, Drizzle,
+  SQLAlchemy, SQLModel, SQLx), object storage (MinIO/S3), and Railway deployment. This skill
+  ensures Claude researches current best practices via web search BEFORE generating any code,
+  documents all dependency choices with justifications, and follows modern package manager
+  recommendations (Bun for JS/TS, uv for Python, cargo for Rust, SPM for Swift).
 ---
 
 # Eagle Multi-Stack Scaffolder
@@ -53,6 +56,7 @@ When the user describes what they want to build, map their request to the approp
 | "Rust API", "Axum", "high-performance backend", "memory-safe" | Rust + Axum | `references/rust-backend.md` |
 | "React dashboard", "Next.js", "React SSR", "React admin" | Next.js | `references/nextjs.md` |
 | "Vue dashboard", "Nuxt", "Vue SSR", "Vue admin" | Nuxt.js | `references/nuxtjs.md` |
+| "monorepo", "Turborepo", "multiple apps", "shared packages" | Monorepo | `references/monorepo.md` |
 
 **Note**: Users often need MULTIPLE stacks. For example:
 - "Build me a mobile app with a backend" → Expo + Node.js (or FastAPI)

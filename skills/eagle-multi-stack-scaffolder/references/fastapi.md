@@ -2,67 +2,373 @@
 
 ## Research Queries
 - "FastAPI best practices 2025 2026"
-- "FastAPI project structure large applications"
-- "FastAPI vs Django vs Flask 2025"
 - "FastAPI SQLAlchemy vs SQLModel 2025"
-- "FastAPI authentication JWT OAuth 2025"
+- "FastAPI project structure large applications"
+- "Railway FastAPI deployment 2025"
+- "MinIO Python S3 integration"
 
 ## Package Manager
-**uv** - 10-100x faster than pip, proper dependency resolution, built-in virtual environment management.
+**uv** - 10-100x faster than pip, proper dependency resolution.
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 uv init my-api && cd my-api
-uv add fastapi uvicorn[standard]
+uv add fastapi "uvicorn[standard]"
 ```
+
+---
+
+## Database Selection
+
+| Database | Use Case | Driver |
+|----------|----------|--------|
+| **PostgreSQL** | Production apps, complex queries, ACID | `asyncpg` (async), `psycopg` (sync) |
+| **MongoDB** | Document-based, flexible schema | `motor` (async), `pymongo` |
+| **SQLite** | Prototyping, embedded, edge | `aiosqlite` |
+| **Redis** | Caching, sessions, queues | `redis` (async) |
+
+### When to Use What
+- **PostgreSQL**: Default for production. Use with SQLAlchemy or SQLModel.
+- **MongoDB**: When you need flexible schemas, document storage.
+- **SQLite**: Local development, edge deployments, prototyping.
+
+---
+
+## ORM Selection
+
+| Tool | Philosophy | Best For |
+|------|-----------|----------|
+| **SQLAlchemy 2.0** | Full-featured, async | Complex apps, full control |
+| **SQLModel** | SQLAlchemy + Pydantic | FastAPI integration, simplicity |
+| **Tortoise ORM** | Django-like, async-first | Django developers |
+| **Beanie** | MongoDB ODM | MongoDB + Pydantic |
+
+### SQLAlchemy vs SQLModel
+
+```python
+# SQLAlchemy - More control, more verbose
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+
+# SQLModel - Cleaner, Pydantic integrated
+class User(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    email: str = Field(unique=True, max_length=255)
+```
+
+**Choose SQLAlchemy** for: Complex queries, existing SQLAlchemy knowledge, full control
+**Choose SQLModel** for: FastAPI projects, cleaner code, Pydantic integration
+
+---
+
+## Database Setup
+
+### PostgreSQL with SQLModel (Recommended)
+
+```bash
+uv add sqlmodel asyncpg greenlet
+uv add --dev alembic
+```
+
+**src/db/models.py:**
+```python
+from datetime import datetime
+from uuid import UUID, uuid4
+from sqlmodel import SQLModel, Field, Relationship
+
+class UserBase(SQLModel):
+    email: str = Field(unique=True, index=True, max_length=255)
+    name: str | None = Field(default=None, max_length=100)
+    avatar_url: str | None = None
+
+class User(UserBase, table=True):
+    __tablename__ = "users"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    posts: list["Post"] = Relationship(back_populates="author", cascade_delete=True)
+
+class UserCreate(UserBase):
+    pass
+
+class UserResponse(UserBase):
+    id: UUID
+    created_at: datetime
+
+class PostBase(SQLModel):
+    title: str = Field(max_length=200)
+    content: str | None = None
+    published: bool = False
+
+class Post(PostBase, table=True):
+    __tablename__ = "posts"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    author_id: UUID = Field(foreign_key="users.id", index=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    author: User = Relationship(back_populates="posts")
+```
+
+**src/db/session.py:**
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
+
+from src.config import settings
+
+engine = create_async_engine(
+    settings.database_url,
+    echo=settings.debug,
+    pool_size=5,
+    max_overflow=10,
+    pool_pre_ping=True,
+)
+
+AsyncSessionLocal = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+```
+
+### PostgreSQL with SQLAlchemy 2.0
+
+**src/db/base.py:**
+```python
+from datetime import datetime
+from uuid import UUID, uuid4
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+class Base(DeclarativeBase):
+    pass
+
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+class User(Base, TimestampMixin):
+    __tablename__ = "users"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(100))
+```
+
+### MongoDB with Beanie
+
+```bash
+uv add beanie motor
+```
+
+**src/db/models.py:**
+```python
+from datetime import datetime
+from beanie import Document, Indexed
+from pydantic import EmailStr
+
+class User(Document):
+    email: Indexed(EmailStr, unique=True)
+    name: str | None = None
+    avatar_url: str | None = None
+    created_at: datetime = datetime.utcnow()
+    updated_at: datetime = datetime.utcnow()
+
+    class Settings:
+        name = "users"
+```
+
+**src/db/session.py:**
+```python
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from src.config import settings
+from src.db.models import User
+
+async def init_db():
+    client = AsyncIOMotorClient(settings.mongodb_url)
+    await init_beanie(database=client.myapp, document_models=[User])
+```
+
+---
+
+## Object Storage: MinIO
+
+```bash
+uv add boto3 python-multipart
+```
+
+**src/lib/storage.py:**
+```python
+import boto3
+from botocore.config import Config
+
+from src.config import settings
+
+s3 = boto3.client(
+    's3',
+    endpoint_url=settings.minio_endpoint,
+    aws_access_key_id=settings.minio_access_key,
+    aws_secret_access_key=settings.minio_secret_key,
+    config=Config(signature_version='s3v4'),
+    region_name='us-east-1',
+)
+
+BUCKET = settings.minio_bucket
+
+class Storage:
+    @staticmethod
+    def upload(key: str, data: bytes, content_type: str) -> str:
+        s3.put_object(Bucket=BUCKET, Key=key, Body=data, ContentType=content_type)
+        return f"{settings.minio_endpoint}/{BUCKET}/{key}"
+
+    @staticmethod
+    def get_presigned_upload_url(key: str, content_type: str, expires_in: int = 3600) -> str:
+        return s3.generate_presigned_url(
+            'put_object',
+            Params={'Bucket': BUCKET, 'Key': key, 'ContentType': content_type},
+            ExpiresIn=expires_in,
+        )
+
+    @staticmethod
+    def get_presigned_download_url(key: str, expires_in: int = 3600) -> str:
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': BUCKET, 'Key': key},
+            ExpiresIn=expires_in,
+        )
+
+    @staticmethod
+    def delete(key: str):
+        s3.delete_object(Bucket=BUCKET, Key=key)
+
+storage = Storage()
+```
+
+**File Upload Endpoint:**
+```python
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from src.lib.storage import storage
+import uuid
+
+router = APIRouter(prefix="/files", tags=["files"])
+
+@router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    if file.size > 10 * 1024 * 1024:  # 10MB limit
+        raise HTTPException(400, "File too large")
+
+    key = f"{uuid.uuid4()}-{file.filename}"
+    content = await file.read()
+    url = storage.upload(key, content, file.content_type)
+
+    return {"url": url, "key": key}
+```
+
+---
+
+## Migrations with Alembic
+
+```bash
+uv add --dev alembic
+uv run alembic init alembic
+```
+
+**alembic/env.py:**
+```python
+import asyncio
+from sqlalchemy.ext.asyncio import create_async_engine
+from alembic import context
+from src.config import settings
+from src.db.models import SQLModel  # or Base for SQLAlchemy
+
+config = context.config
+target_metadata = SQLModel.metadata
+
+def run_migrations_offline():
+    context.configure(url=settings.database_url, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
+
+def do_run_migrations(connection):
+    context.configure(connection=connection, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
+
+async def run_migrations_online():
+    connectable = create_async_engine(settings.database_url)
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    asyncio.run(run_migrations_online())
+```
+
+**Commands:**
+```bash
+uv run alembic revision --autogenerate -m "initial"
+uv run alembic upgrade head
+uv run alembic downgrade -1
+```
+
+---
 
 ## Project Structure
 
 ```
 src/
-├── main.py                      # Application entry point
-├── config/
+├── main.py                      # Application entry
+├── config.py                    # Settings
+├── db/
 │   ├── __init__.py
-│   ├── settings.py              # Pydantic settings
-│   └── database.py              # Database connection
+│   ├── models.py                # SQLModel/SQLAlchemy models
+│   ├── session.py               # Database connection
+│   └── seed.py                  # Seed data
+├── lib/
+│   ├── storage.py               # MinIO client
+│   └── security.py              # JWT, hashing
 ├── api/
 │   ├── __init__.py
 │   ├── deps.py                  # Shared dependencies
 │   └── v1/
 │       ├── __init__.py
-│       ├── router.py            # API router aggregator
+│       ├── router.py
 │       └── endpoints/
-│           ├── __init__.py
 │           ├── users.py
 │           ├── auth.py
-│           └── farmers.py
-├── core/
-│   ├── __init__.py
-│   ├── security.py              # JWT, hashing
-│   └── exceptions.py            # Custom exceptions
-├── models/
-│   ├── __init__.py
-│   ├── base.py                  # Base model class
-│   ├── user.py
-│   └── farmer.py
-├── schemas/
-│   ├── __init__.py
-│   ├── user.py                  # Pydantic schemas
-│   └── farmer.py
+│           └── files.py
 ├── services/
 │   ├── __init__.py
-│   ├── user_service.py
-│   └── farmer_service.py
-├── repositories/
-│   ├── __init__.py
-│   ├── base.py                  # Generic repository
-│   └── farmer_repository.py
+│   └── user_service.py
+├── schemas/                     # Pydantic schemas (if not using SQLModel)
 └── tests/
-    ├── __init__.py
-    ├── conftest.py
-    └── api/
-        └── test_farmers.py
+alembic/                         # Migrations
 ```
+
+---
 
 ## Essential Libraries
 
@@ -70,38 +376,53 @@ src/
 # Core
 uv add fastapi "uvicorn[standard]"
 
-# Database (choose one)
-uv add sqlalchemy asyncpg          # PostgreSQL async
-uv add sqlmodel                    # SQLAlchemy + Pydantic hybrid
+# Database (choose)
+uv add sqlmodel asyncpg greenlet           # SQLModel + PostgreSQL
+uv add sqlalchemy asyncpg                  # SQLAlchemy + PostgreSQL
+uv add beanie motor                        # MongoDB
 
-# Validation & Settings
-uv add pydantic-settings           # Environment configuration
+# Migrations
+uv add --dev alembic
 
-# Authentication
-uv add "python-jose[cryptography]" # JWT tokens
-uv add passlib[bcrypt]             # Password hashing
+# Object Storage
+uv add boto3 python-multipart
 
-# HTTP Client (for external APIs)
-uv add httpx                       # Async HTTP client
+# Settings
+uv add pydantic-settings
 
-# Dev tools
-uv add --dev pytest pytest-asyncio pytest-cov
-uv add --dev ruff mypy             # Linting & type checking
-uv add --dev pre-commit
+# Auth
+uv add "python-jose[cryptography]" "passlib[bcrypt]"
+
+# HTTP Client
+uv add httpx
+
+# Dev
+uv add --dev pytest pytest-asyncio ruff mypy
 ```
 
-## Code Patterns
+---
 
-### Settings (Pydantic)
+## Configuration
+
+**src/config.py:**
 ```python
-# config/settings.py
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
 class Settings(BaseSettings):
     app_name: str = "My API"
     debug: bool = False
-    database_url: str
+
+    # Database
+    database_url: str  # postgresql+asyncpg://user:pass@host/db
+
+    # MinIO
+    minio_endpoint: str | None = None
+    minio_access_key: str | None = None
+    minio_secret_key: str | None = None
+    minio_bucket: str = "uploads"
+
+    # Auth
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
@@ -112,195 +433,89 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-```
-
-### Database Setup (Async SQLAlchemy)
-```python
-# config/database.py
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-
-from .settings import get_settings
 
 settings = get_settings()
-engine = create_async_engine(settings.database_url, echo=settings.debug)
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-
-async def get_db() -> AsyncSession:
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
 ```
 
-### Base Model
-```python
-# models/base.py
-from sqlalchemy import Column, DateTime
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
-import uuid
+---
 
-from config.database import Base
+## Deployment: Railway
 
-class BaseModel(Base):
-    __abstract__ = True
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+### railway.json
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "uv run uvicorn src.main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 30
+  }
+}
 ```
 
-### Pydantic Schema
-```python
-# schemas/farmer.py
-from pydantic import BaseModel, ConfigDict
-from uuid import UUID
-from datetime import datetime
-
-class FarmerBase(BaseModel):
-    name: str
-    phone: str
-    location: str | None = None
-
-class FarmerCreate(FarmerBase):
-    pass
-
-class FarmerUpdate(BaseModel):
-    name: str | None = None
-    phone: str | None = None
-    location: str | None = None
-
-class FarmerResponse(FarmerBase):
-    id: UUID
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
+### Procfile (Alternative)
+```
+web: uv run uvicorn src.main:app --host 0.0.0.0 --port $PORT
 ```
 
-### Service Layer
-```python
-# services/farmer_service.py
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from uuid import UUID
+### Deploy Commands
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
 
-from models.farmer import Farmer
-from schemas.farmer import FarmerCreate, FarmerUpdate
+railway login
+railway init
+railway up
 
-class FarmerService:
-    def __init__(self, db: AsyncSession):
-        self.db = db
+# Add PostgreSQL
+railway add -d postgresql
 
-    async def get_all(self, skip: int = 0, limit: int = 100) -> list[Farmer]:
-        result = await self.db.execute(
-            select(Farmer).offset(skip).limit(limit)
-        )
-        return result.scalars().all()
-
-    async def get_by_id(self, farmer_id: UUID) -> Farmer | None:
-        result = await self.db.execute(
-            select(Farmer).where(Farmer.id == farmer_id)
-        )
-        return result.scalar_one_or_none()
-
-    async def create(self, data: FarmerCreate) -> Farmer:
-        farmer = Farmer(**data.model_dump())
-        self.db.add(farmer)
-        await self.db.flush()
-        await self.db.refresh(farmer)
-        return farmer
-
-    async def update(self, farmer_id: UUID, data: FarmerUpdate) -> Farmer | None:
-        farmer = await self.get_by_id(farmer_id)
-        if not farmer:
-            return None
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(farmer, field, value)
-        await self.db.flush()
-        await self.db.refresh(farmer)
-        return farmer
+# Set environment variables
+railway variables set SECRET_KEY=$(openssl rand -hex 32)
 ```
 
-### API Endpoint
-```python
-# api/v1/endpoints/farmers.py
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
+### Dockerfile (Alternative)
+```dockerfile
+FROM python:3.12-slim
 
-from config.database import get_db
-from schemas.farmer import FarmerCreate, FarmerUpdate, FarmerResponse
-from services.farmer_service import FarmerService
+WORKDIR /app
 
-router = APIRouter(prefix="/farmers", tags=["farmers"])
+# Install uv
+RUN pip install uv
 
-def get_farmer_service(db: AsyncSession = Depends(get_db)) -> FarmerService:
-    return FarmerService(db)
+# Copy and install dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
 
-@router.get("", response_model=list[FarmerResponse])
-async def list_farmers(
-    skip: int = 0,
-    limit: int = 100,
-    service: FarmerService = Depends(get_farmer_service)
-):
-    return await service.get_all(skip=skip, limit=limit)
+# Copy source
+COPY . .
 
-@router.get("/{farmer_id}", response_model=FarmerResponse)
-async def get_farmer(
-    farmer_id: UUID,
-    service: FarmerService = Depends(get_farmer_service)
-):
-    farmer = await service.get_by_id(farmer_id)
-    if not farmer:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Farmer not found")
-    return farmer
-
-@router.post("", response_model=FarmerResponse, status_code=status.HTTP_201_CREATED)
-async def create_farmer(
-    data: FarmerCreate,
-    service: FarmerService = Depends(get_farmer_service)
-):
-    return await service.create(data)
-
-@router.patch("/{farmer_id}", response_model=FarmerResponse)
-async def update_farmer(
-    farmer_id: UUID,
-    data: FarmerUpdate,
-    service: FarmerService = Depends(get_farmer_service)
-):
-    farmer = await service.update(farmer_id, data)
-    if not farmer:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Farmer not found")
-    return farmer
+# Run migrations and start
+CMD uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port $PORT
 ```
+
+---
+
+## Code Patterns
 
 ### Main Application
 ```python
-# main.py
+# src/main.py
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
-from config.settings import get_settings
-from config.database import engine, Base
-from api.v1.router import api_router
-
-settings = get_settings()
+from src.config import settings
+from src.db.session import init_db
+from src.api.v1.router import api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await init_db()
     yield
-    # Shutdown
-    await engine.dispose()
 
 app = FastAPI(
     title=settings.app_name,
@@ -311,7 +526,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -320,31 +535,82 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/health")
-async def health_check():
+async def health():
     return {"status": "healthy"}
 ```
 
-### Exception Handling
+### Service Layer
 ```python
-# core/exceptions.py
-from fastapi import HTTPException, status
+# src/services/user_service.py
+from uuid import UUID
+from sqlmodel import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-class NotFoundError(HTTPException):
-    def __init__(self, detail: str = "Resource not found"):
-        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+from src.db.models import User, UserCreate
+from src.core.exceptions import NotFoundError, ConflictError
 
-class BadRequestError(HTTPException):
-    def __init__(self, detail: str = "Bad request"):
-        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+class UserService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
 
-class UnauthorizedError(HTTPException):
-    def __init__(self, detail: str = "Not authenticated"):
-        super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=detail,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    async def get_all(self, skip: int = 0, limit: int = 20) -> list[User]:
+        result = await self.db.execute(select(User).offset(skip).limit(limit))
+        return result.scalars().all()
+
+    async def get_by_id(self, user_id: UUID) -> User:
+        result = await self.db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            raise NotFoundError("User not found")
+        return user
+
+    async def create(self, data: UserCreate) -> User:
+        # Check if email exists
+        result = await self.db.execute(select(User).where(User.email == data.email))
+        if result.scalar_one_or_none():
+            raise ConflictError("Email already exists")
+
+        user = User.model_validate(data)
+        self.db.add(user)
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
 ```
+
+### API Endpoint
+```python
+# src/api/v1/endpoints/users.py
+from uuid import UUID
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.db.session import get_db
+from src.db.models import UserCreate, UserResponse
+from src.services.user_service import UserService
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
+    return UserService(db)
+
+@router.get("", response_model=list[UserResponse])
+async def list_users(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    service: UserService = Depends(get_user_service),
+):
+    return await service.get_all(skip=skip, limit=limit)
+
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user(user_id: UUID, service: UserService = Depends(get_user_service)):
+    return await service.get_by_id(user_id)
+
+@router.post("", response_model=UserResponse, status_code=201)
+async def create_user(data: UserCreate, service: UserService = Depends(get_user_service)):
+    return await service.create(data)
+```
+
+---
 
 ## Setup Commands
 
@@ -353,56 +619,36 @@ class UnauthorizedError(HTTPException):
 uv init my-api && cd my-api
 
 # Add dependencies
-uv add fastapi "uvicorn[standard]"
-uv add sqlalchemy asyncpg pydantic-settings
+uv add fastapi "uvicorn[standard]" sqlmodel asyncpg pydantic-settings
+uv add boto3 python-multipart
 uv add "python-jose[cryptography]" "passlib[bcrypt]"
-uv add --dev pytest pytest-asyncio ruff mypy
+uv add --dev alembic pytest pytest-asyncio ruff mypy
 
 # Create structure
-mkdir -p src/{config,api/v1/endpoints,core,models,schemas,services,repositories,tests/api}
-touch src/{main.py,__init__.py}
-touch src/config/{__init__.py,settings.py,database.py}
-touch src/api/{__init__.py,deps.py}
-touch src/api/v1/{__init__.py,router.py}
+mkdir -p src/{db,lib,api/v1/endpoints,services,tests}
+touch src/{main.py,config.py,__init__.py}
 
 # Environment
-echo "DATABASE_URL=postgresql+asyncpg://user:pass@localhost/dbname" > .env
-echo "SECRET_KEY=$(openssl rand -hex 32)" >> .env
+cat > .env << EOF
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost/myapp
+SECRET_KEY=$(openssl rand -hex 32)
+MINIO_ENDPOINT=http://localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+EOF
 
 # Run
-uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn src.main:app --reload
 ```
 
-## pyproject.toml
-
-```toml
-[project]
-name = "my-api"
-version = "0.1.0"
-requires-python = ">=3.11"
-
-[tool.ruff]
-target-version = "py311"
-line-length = 100
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
-
-[tool.mypy]
-python_version = "3.11"
-strict = true
-plugins = ["pydantic.mypy"]
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["src/tests"]
-```
+---
 
 ## Key Rules
 
-- Use async/await everywhere - FastAPI is built for async
-- Use Pydantic for ALL data validation and serialization
-- Use dependency injection for services and database sessions
-- Keep endpoints thin - business logic goes in services
-- Use proper status codes (201 for created, 204 for no content, etc.)
-- Document endpoints with docstrings (shows in OpenAPI)
+- Use async everywhere - FastAPI is async-first
+- Use SQLModel for Pydantic + SQLAlchemy integration
+- Use Alembic for migrations, never raw SQL DDL
+- Use MinIO for file storage (S3-compatible)
+- Deploy to Railway with PostgreSQL addon
+- Use dependency injection for services
+- Keep endpoints thin, business logic in services
