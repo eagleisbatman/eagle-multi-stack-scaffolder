@@ -110,37 +110,110 @@ Just describe what you want to build. Claude will figure out which stacks you ne
 
 ### Examples
 
-**Cross-platform mobile app:**
+#### Mobile Development
+
+**iOS app with SwiftUI:**
 ```
-Create a fitness tracking app for iOS and Android
+Create a native iOS app for task management with SwiftUI and a proper design system
 ```
 
-**Full-stack project:**
+**Android app with Jetpack Compose:**
 ```
-I need a mobile app with a Node backend and admin dashboard
-```
-
-**Specific stack:**
-```
-Set up a new Django REST API with PostgreSQL
+Build a native Android app using Jetpack Compose with Material 3 theming
 ```
 
-**Python API with FastAPI:**
+**Android app with XML Views:**
 ```
-Create a FastAPI backend with JWT authentication and PostgreSQL
+Set up a traditional Android app using Kotlin and XML views with Material 3
 ```
 
-**Multi-stack:**
+**Flutter cross-platform:**
+```
+Create a Flutter app for iOS and Android with Riverpod state management and Material 3
+```
+
+**React Native with Expo:**
+```
+Build a cross-platform mobile app using Expo with NativeWind for styling
+```
+
+#### Backend Development
+
+**Node.js + Express:**
+```
+Set up a Node.js Express API with Prisma, PostgreSQL, and JWT authentication
+```
+
+**FastAPI (Python):**
+```
+Create a FastAPI backend with SQLModel, PostgreSQL, Alembic migrations, and MinIO for file uploads
+```
+
+**Flask (Python):**
+```
+Build a Flask REST API with SQLAlchemy, PostgreSQL, and Marshmallow validation
+```
+
+**Django (Python):**
+```
+Set up a Django REST API with PostgreSQL, custom user model, and drf-spectacular docs
+```
+
+**Rust with Axum:**
+```
+Create a high-performance Rust API using Axum with SQLx and PostgreSQL
+```
+
+#### Web Frontend
+
+**Next.js dashboard:**
+```
+Build a Next.js admin dashboard with authentication and server components
+```
+
+**Nuxt.js application:**
+```
+Create a Nuxt.js web app with Vue 3, Pinia state management, and SSR
+```
+
+#### Full-Stack & Multi-Stack
+
+**Full-stack with database:**
+```
+I need a mobile app with a FastAPI backend, PostgreSQL database, and file uploads to MinIO
+```
+
+**Multi-platform project:**
 ```
 Build me:
-- React Native app (Expo)
-- Express API backend
+- React Native app (Expo) with NativeWind
+- Express API with Drizzle ORM
 - Next.js admin panel
+- Shared TypeScript types
 ```
+
+**Native apps with shared backend:**
+```
+Create:
+- SwiftUI iOS app
+- Jetpack Compose Android app
+- FastAPI backend with PostgreSQL
+```
+
+#### Architecture & DevOps
 
 **Monorepo setup:**
 ```
-Create a Turborepo monorepo with a Next.js web app, Express API, and shared UI components
+Create a Turborepo monorepo with a Next.js web app, Express API, shared UI components, and Railway deployment
+```
+
+**Full monorepo with mobile:**
+```
+Set up a pnpm monorepo with:
+- Expo React Native app
+- Next.js web app
+- Node.js API
+- Shared packages for types, utils, and UI
 ```
 
 ---
