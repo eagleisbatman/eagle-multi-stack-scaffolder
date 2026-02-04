@@ -5,15 +5,15 @@
     "email": "mandewalkergautam@gmail.com"
   },
   "metadata": {
-    "description": "Research-driven project scaffolding with design systems, database/ORM setup, and Railway deployment. Supports SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, Nuxt.js, and Turborepo monorepos.",
-    "version": "1.0.0"
+    "description": "Research-driven project scaffolding with design systems, database/ORM setup, Railway deployment, and PWA support. Supports SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, Nuxt.js, Turborepo monorepos, and Progressive Web Apps.",
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "eagle-multi-stack-scaffolder",
       "source": "./",
-      "description": "Research-driven scaffolding with design systems, database/ORM setup (PostgreSQL, Prisma, Drizzle, SQLAlchemy), object storage (MinIO), and Railway deployment. Supports SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, Nuxt.js, and Turborepo monorepos. Includes Material 3, Cupertino, NativeWind patterns.",
-      "version": "1.0.0",
+      "description": "Research-driven scaffolding with design systems, database/ORM setup (PostgreSQL, Prisma, Drizzle, SQLAlchemy), object storage (MinIO), Railway deployment, and PWA scaffolding. Supports SwiftUI, Jetpack Compose, Kotlin XML, Flutter, Expo React Native, Node/Express, FastAPI, Flask, Django, Rust, Next.js, Nuxt.js, Turborepo monorepos, and Progressive Web Apps (Quasar, Ionic, Konsta UI).",
+      "version": "1.1.0",
       "author": {
         "name": "Eagle (Gautam Mandewalker)",
         "url": "https://github.com/eagleisbatman"
@@ -56,7 +56,17 @@
         "monorepo",
         "turborepo",
         "database",
-        "orm"
+        "orm",
+        "pwa",
+        "progressive-web-app",
+        "offline-first",
+        "service-worker",
+        "workbox",
+        "dexie",
+        "indexeddb",
+        "quasar",
+        "ionic",
+        "konsta-ui"
       ],
       "category": "development",
       "strict": false
