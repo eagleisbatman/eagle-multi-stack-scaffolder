@@ -16,7 +16,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Stacks-13-green?style=for-the-badge" alt="13 Stacks">
+  <img src="https://img.shields.io/badge/Stacks-13+-green?style=for-the-badge" alt="13+ Stacks">
+  <img src="https://img.shields.io/badge/Skills-2-orange?style=for-the-badge" alt="2 Skills">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -84,6 +85,22 @@ All backend stacks include:
 
 Monorepo support includes Turborepo + pnpm workspaces, shared packages, remote caching, and per-app Railway deployment.
 
+### Progressive Web Apps (NEW!)
+| Stack | Use Case |
+|-------|----------|
+| **Quasar (Vue)** | Full-featured PWAs with best offline support |
+| **Ionic Vue** | PWAs with Capacitor for potential native bridge |
+| **Ionic React** | React-based PWAs with native-like UI |
+| **Next.js + Konsta UI** | SSR/SEO-focused PWAs |
+
+The **pwa-mobile-first** skill includes:
+- **Workbox** service worker configuration
+- **Dexie.js** offline data sync with IndexedDB
+- **iOS safe-area** handling for notch/home indicator
+- **Add-to-Home-Screen** prompts (with iOS fallback)
+- **Optimistic UI**, pull-to-refresh, skeleton loaders
+- **PWA validation checklist** with automated script
+
 ---
 
 ## 🚀 Installation
@@ -101,6 +118,24 @@ Monorepo support includes Turborepo + pnpm workspaces, shared packages, remote c
 ```
 
 That's it! Claude will now automatically use this skill when relevant.
+
+### Updating the Plugin
+
+To get the latest version with new skills and improvements:
+
+```bash
+# Navigate to your Claude Code plugins directory
+cd ~/.claude/plugins/eagle-multi-stack-scaffolder
+
+# Pull the latest changes
+git pull origin main
+```
+
+Or reinstall completely:
+```bash
+/plugin uninstall eagle-multi-stack-scaffolder
+/plugin install eagle-multi-stack-scaffolder
+```
 
 ---
 
@@ -174,6 +209,23 @@ Build a Next.js admin dashboard with authentication and server components
 **Nuxt.js application:**
 ```
 Create a Nuxt.js web app with Vue 3, Pinia state management, and SSR
+```
+
+#### Progressive Web Apps
+
+**Offline-first PWA:**
+```
+Build a PWA for field workers that works offline, syncs data when back online, and feels native on iOS/Android
+```
+
+**PWA with Vue:**
+```
+Create a Quasar PWA with offline data storage, background sync, and add-to-homescreen prompt
+```
+
+**SEO-focused PWA:**
+```
+Build a Next.js PWA with Konsta UI that has good SEO and works offline
 ```
 
 #### Full-Stack & Multi-Stack
@@ -270,6 +322,7 @@ Like how **Bun** elegantly solves JavaScript dependencies, this plugin recommend
 
 The plugin includes detailed guides for each stack:
 
+### Multi-Stack Scaffolder
 ```
 skills/eagle-multi-stack-scaffolder/references/
 ├── swiftui.md           # iOS/macOS with design system
@@ -287,13 +340,33 @@ skills/eagle-multi-stack-scaffolder/references/
 └── monorepo.md          # Turborepo + pnpm workspaces
 ```
 
+### PWA Mobile-First
+```
+skills/pwa-mobile-first/
+├── SKILL.md                    # Main skill definition
+├── references/
+│   ├── quasar.md               # Quasar Framework (recommended)
+│   ├── ionic-vue.md            # Ionic + Vue
+│   ├── ionic-react.md          # Ionic + React
+│   └── nextjs-konsta.md        # Next.js + Konsta UI
+└── templates/
+    ├── manifest.md             # Web app manifest config
+    ├── service-worker.md       # Workbox caching strategies
+    ├── ios-safe-areas.md       # iOS notch/safe area CSS
+    ├── touch-styles.md         # Touch-optimized styles
+    ├── offline-sync.md         # Dexie.js + background sync
+    ├── a2hs-prompt.md          # Add-to-home-screen component
+    ├── workflow-patterns.md    # Optimistic UI, pull-to-refresh
+    └── pwa-checklist.md        # Validation checklist + script
+```
+
 Each reference includes:
 - Research queries to run
 - Recommended project structure
-- Database & ORM setup
+- Database & ORM setup (where applicable)
 - Essential libraries
 - Code patterns
-- Deployment configuration (Railway)
+- Deployment configuration
 - Setup commands
 
 ---
